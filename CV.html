@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emmanuel Bamfo Okyere - Professional Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --accent: #0ea5e9;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #1e293b;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .resume-card {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, #e2e8f0, transparent);
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -25px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: -20px;
+            top: 20px;
+            bottom: -30px;
+            width: 2px;
+            background: #e2e8f0;
+        }
+
+        .skill-tag {
+            background: #f1f5f9;
+            transition: all 0.2s ease;
+        }
+
+        .skill-tag:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* AI Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ai-sparkle {
+            background: linear-gradient(45deg, #4f46e5, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .resume-card { box-shadow: none; border-radius: 0; max-width: 100%; margin: 0; }
+            .no-print, .ai-tools { display: none !important; }
+            .glass { backdrop-filter: none; background: white; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4f46e5;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="py-12 px-4 md:px-6 lg:px-8">
+
+    <!-- AI Floating Tools (No-Print) -->
+    <div class="fixed bottom-6 right-6 flex flex-col gap-3 z-40 no-print ai-tools">
+        <button onclick="openAIModal('coverLetter')" class="bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-2xl transition-all transform hover:scale-105 group relative">
+            <i class="fas fa-magic"></i>
+            <span class="absolute right-full mr-3 bg-slate-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">✨ Draft Cover Letter</span>
+        </button>
+        <button onclick="openAIModal('interview')" class="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-2xl transition-all transform hover:scale-105 group relative">
+            <i class="fas fa-user-tie"></i>
+            <span class="absolute right-full mr-3 bg-slate-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap">✨ Interview Prep</span>
+        </button>
+    </div>
+
+    <div id="aiModal" class="modal-overlay">
+        <div class="bg-white w-full max-w-2xl rounded-3xl p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeAIModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <div id="modalContent">
+                <h2 id="modalTitle" class="text-2xl font-extrabold text-slate-900 mb-4 flex items-center gap-2"></h2>
+                <div id="aiInputSection" class="space-y-4">
+                    <p id="modalDescription" class="text-slate-600 text-sm"></p>
+                    <textarea id="aiInput" class="w-full h-32 p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm" placeholder="Paste the job description here..."></textarea>
+                    <button id="aiSubmitBtn" onclick="runAIFeature()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-indigo-600 transition-colors flex items-center justify-center gap-2">
+                        <span>✨ Generate with Gemini</span>
+                    </button>
+                </div>
+                <div id="aiResult" class="hidden mt-6 p-6 bg-slate-50 rounded-2xl border border-slate-100 text-slate-700 text-sm leading-relaxed whitespace-pre-wrap">
+                </div>
+                <div id="aiLoading" class="hidden mt-6 text-center">
+                    <div class="loader"></div>
+                    <p class="text-sm text-slate-500 mt-2">Gemini is thinking...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-5xl mx-auto resume-card glass rounded-3xl overflow-hidden flex flex-col md:flex-row fade-in">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-[320px] bg-slate-900 text-white p-10">
+            <div class="mb-12">
+                <div class="w-20 h-20 bg-indigo-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-500/20">
+                    <span class="text-3xl font-extrabold">EO</span>
+                </div>
+                <h1 class="text-3xl font-extrabold leading-tight tracking-tight">Emmanuel<br>Bamfo Okyere</h1>
+                <p class="text-indigo-400 font-medium mt-2">IT Support Specialist & Technical Trainer</p>
+            </div>
+
+            <div class="space-y-10">
+                <section>
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Contact Details</h3>
+                    <div class="space-y-4 text-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-indigo-400">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <a href="mailto:pk4eman@gmail.com" class="hover:text-indigo-300 transition-colors">pk4eman@gmail.com</a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-indigo-400">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <span>+233 20 322 9729</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-indigo-400">
+                                <i class="fas fa-location-dot"></i>
+                            </div>
+                            <span>Accra, Ghana</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-indigo-400">
+                                <i class="fab fa-linkedin"></i>
+                            </div>
+                            <a href="https://linkedin.com/in/emmanuel-bamfo-okyere-82114b1a2/" target="_blank" class="hover:text-indigo-300 transition-colors">LinkedIn</a>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Expertise</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="skill-tag px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-900">Python Automation</span>
+                        <span class="skill-tag px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-900">SQL (Data Science)</span>
+                        <span class="skill-tag px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-900">Identity Management</span>
+                        <span class="skill-tag px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-900">Network Security</span>
+                        <span class="skill-tag px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-900">Biometrics</span>
+                        <span class="skill-tag px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-900">Machine Learning</span>
+                    </div>
+                </section>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="resumeMainContent" class="flex-1 p-10 md:p-14 bg-white">
+            <section class="mb-12">
+                <div class="section-header">
+                    <h2 class="text-sm font-extrabold text-indigo-600 uppercase tracking-widest">About Me</h2>
+                </div>
+                <p class="text-slate-600 leading-relaxed text-lg font-light">
+                    IT professional and Technical Trainer with <span class="font-semibold text-slate-900">6+ years of impact</span> in Identity Management Systems and Database Administration. Proven track record at the <span class="text-indigo-600 font-semibold">National Identification Authority</span>.
+                </p>
+            </section>
+
+            <section class="mb-12">
+                <div class="section-header">
+                    <h2 class="text-sm font-extrabold text-indigo-600 uppercase tracking-widest">Work History</h2>
+                </div>
+                
+                <div class="space-y-10 pl-6 border-l-2 border-slate-100">
+                    <div class="relative">
+                        <div class="timeline-dot"></div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="text-xl font-bold text-slate-900">Phone Verification Specialist</h3>
+                                <p class="text-indigo-600 font-medium text-sm">INFUSEmedia [Let's Verify] • Remote</p>
+                            </div>
+                            <span class="text-xs font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-full">2022 — PRESENT</span>
+                        </div>
+                        <p class="text-slate-600 text-sm mt-2">Verified client information by analyzing existing evidence on file while maintaining strict GDPR compliance.</p>
+                    </div>
+
+                    <div class="relative">
+                        <div class="timeline-dot"></div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="text-xl font-bold text-slate-900">Multi-Perso DBA</h3>
+                                <p class="text-indigo-600 font-medium text-sm">National Identification Authority • Accra</p>
+                            </div>
+                            <span class="text-xs font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-full">2021 — DATE</span>
+                        </div>
+                        <p class="text-slate-600 text-sm mt-2">Engineered system configurations for national identity card issuance infrastructure serving 297 offices.</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <section>
+                    <div class="section-header">
+                        <h2 class="text-sm font-extrabold text-indigo-600 uppercase tracking-widest text-[10px]">Education</h2>
+                    </div>
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                        <h4 class="font-bold text-slate-900 text-sm">B.Sc. Computer Engineering</h4>
+                        <p class="text-xs text-indigo-600">University of Ghana • 2017</p>
+                    </div>
+                </section>
+                <section>
+                    <div class="section-header">
+                        <h2 class="text-sm font-extrabold text-indigo-600 uppercase tracking-widest text-[10px]">Certifications</h2>
+                    </div>
+                    <p class="text-xs text-slate-600">ISO/IEC 27001 Security, Google IT Support, SQL for Data Science.</p>
+                </section>
+            </div>
+
+            <div class="mt-16 pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6 no-print">
+                <p class="text-xs text-slate-400 font-medium italic">Powered by Gemini AI Technology.</p>
+                <button onclick="window.print()" class="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm transition-all hover:bg-indigo-600">
+                    <i class="fas fa-file-pdf mr-2"></i> Export PDF
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Background Decoration -->
+    <div class="fixed top-0 right-0 -z-10 w-96 h-96 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+
+    <script>
+        const apiKey = ""; // Set by runtime
+        let currentMode = "";
+
+        function openAIModal(mode) {
+            currentMode = mode;
+            const modal = document.getElementById('aiModal');
+            const title = document.getElementById('modalTitle');
+            const desc = document.getElementById('modalDescription');
+            const input = document.getElementById('aiInput');
+            const result = document.getElementById('aiResult');
+            
+            modal.style.display = 'flex';
+            result.classList.add('hidden');
+            document.getElementById('aiInputSection').classList.remove('hidden');
+
+            if (mode === 'coverLetter') {
+                title.innerHTML = '✨ AI Cover Letter Drafter';
+                desc.innerText = 'Paste a Job Description below, and I will write a customized cover letter using your resume data.';
+                input.placeholder = "Paste the job description here...";
+            } else if (mode === 'interview') {
+                title.innerHTML = '✨ Interview Prep Coach';
+                desc.innerText = 'Tell me the role you are applying for, and I will generate 5 targeted interview questions and suggested answers based on your resume.';
+                input.placeholder = "e.g. Senior IT Support Engineer at a Fintech startup...";
+            }
+        }
+
+        function closeAIModal() {
+            document.getElementById('aiModal').style.display = 'none';
+        }
+
+        async function runAIFeature() {
+            const userInput = document.getElementById('aiInput').value;
+            const loading = document.getElementById('aiLoading');
+            const resultBox = document.getElementById('aiResult');
+            const inputSection = document.getElementById('aiInputSection');
+            
+            if (!userInput) return;
+
+            inputSection.classList.add('hidden');
+            loading.classList.remove('hidden');
+
+            const resumeContext = document.getElementById('resumeMainContent').innerText;
+            
+            let systemPrompt = "";
+            if (currentMode === 'coverLetter') {
+                systemPrompt = "You are a professional career coach. Write a compelling, modern cover letter for Emmanuel Bamfo Okyere based on his resume context and the provided job description. Focus on his technical training and NIA experience.";
+            } else {
+                systemPrompt = "You are an expert interviewer. Generate 5 behavioral and technical interview questions for Emmanuel Bamfo Okyere based on his resume and the target role provided. Include brief 'ideal answer' bullet points for each.";
+            }
+
+            try {
+                const response = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: `User Job Info: ${userInput}\n\nResume Context: ${resumeContext}` }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    })
+                });
+
+                const data = await response.json();
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
+                
+                loading.classList.add('hidden');
+                resultBox.classList.remove('hidden');
+                resultBox.innerText = text;
+            } catch (error) {
+                loading.classList.add('hidden');
+                resultBox.classList.remove('hidden');
+                resultBox.innerText = "Error connecting to AI. Please try again.";
+            }
+        }
+
+        async function fetchWithRetry(url, options, retries = 5, backoff = 1000) {
+            try {
+                const res = await fetch(url, options);
+                if (!res.ok && retries > 0) throw new Error();
+                return res;
+            } catch (err) {
+                if (retries <= 0) throw err;
+                await new Promise(r => setTimeout(r, backoff));
+                return fetchWithRetry(url, options, retries - 1, backoff * 2);
+            }
+        }
+    </script>
+</body>
+</html>
